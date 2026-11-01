@@ -1,7 +1,2 @@
-chmod u+x 3-name
-export CFILE=main.c
-./3-name
-ls
-./cisfun
-echo $?
-wc -l 3-name
+#!/bin/bash
+gcc "$CFILE" -o cisfun
