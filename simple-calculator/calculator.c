@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define LINE_SIZE 64
+
 /**
  * print_menu - displays the calculator menu
  */
@@ -15,19 +17,18 @@ void print_menu(void)
 }
 
 /**
- * read_choice - reads one menu choice from standard input
- * @choice: where the number read is stored
+ * read_line - reads one line from standard input
+ * @line: buffer receiving the line
+ * @size: size of the buffer
  *
- * Return: 1 if a number was read, 0 if the input is not a valid number,
+ * Return: 1 if a line was read, 0 if the line was too long,
  * -1 on end of input
  */
-int read_choice(long *choice)
+int read_line(char *line, int size)
 {
-	char line[64];
-	char *end;
 	int c;
 
-	if (fgets(line, sizeof(line), stdin) == NULL)
+	if (fgets(line, size, stdin) == NULL)
 		return (-1);
 
 	if (strchr(line, '\n') == NULL)
@@ -41,6 +42,26 @@ int read_choice(long *choice)
 		}
 	}
 
+	return (1);
+}
+
+/**
+ * read_choice - reads one menu choice from standard input
+ * @choice: where the number read is stored
+ *
+ * Return: 1 if a number was read, 0 if the input is not a valid number,
+ * -1 on end of input
+ */
+int read_choice(long *choice)
+{
+	char line[LINE_SIZE];
+	char *end;
+	int status;
+
+	status = read_line(line, LINE_SIZE);
+	if (status != 1)
+		return (status);
+
 	*choice = strtol(line, &end, 10);
 	if (end == line)
 		return (0);
@@ -49,6 +70,68 @@ int read_choice(long *choice)
 		end++;
 	if (*end != '\0')
 		return (0);
+
+	return (1);
+}
+
+/**
+ * read_number - prompts until the user enters a valid number
+ * @prompt: text displayed before reading
+ * @value: where the number read is stored
+ *
+ * Return: 1 on success, -1 on end of input
+ */
+int read_number(char *prompt, double *value)
+{
+	char line[LINE_SIZE];
+	char *end;
+	int status;
+
+	while (1)
+	{
+		printf("%s", prompt);
+		status = read_line(line, LINE_SIZE);
+		if (status == -1)
+			return (-1);
+		if (status == 1)
+		{
+			*value = strtod(line, &end);
+			if (end != line)
+			{
+				while (*end == ' ' || *end == '\t' || *end == '\n')
+					end++;
+				if (*end == '\0')
+					return (1);
+			}
+		}
+		printf("Invalid number\n");
+	}
+}
+
+/**
+ * run_choice - runs the operation chosen in the menu
+ * @choice: validated menu choice from 1 to 4
+ *
+ * Return: 1 on success, -1 on end of input
+ */
+int run_choice(long choice)
+{
+	double a;
+	double b;
+
+	if (choice > 2)
+	{
+		printf("Not implemented yet\n");
+		return (1);
+	}
+
+	if (read_number("A: ", &a) == -1 || read_number("B: ", &b) == -1)
+		return (-1);
+
+	if (choice == 1)
+		printf("Result: %.10g\n", a + b);
+	else
+		printf("Result: %.10g\n", a - b);
 
 	return (1);
 }
@@ -80,8 +163,11 @@ int main(void)
 			choice = -1;
 		if (status == 0 || choice < 0 || choice > 4)
 			printf("Invalid choice\n");
-		else if (choice != 0)
-			printf("Not implemented yet\n");
+		else if (choice != 0 && run_choice(choice) == -1)
+		{
+			printf("\n");
+			break;
+		}
 	}
 
 	printf("Bye!\n");
