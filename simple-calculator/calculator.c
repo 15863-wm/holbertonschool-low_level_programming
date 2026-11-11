@@ -109,6 +109,24 @@ int read_number(char *prompt, double *value)
 }
 
 /**
+ * compute - applies the arithmetic operation chosen in the menu
+ * @choice: 1 to add, 2 to subtract, 3 to multiply
+ * @a: first operand
+ * @b: second operand
+ *
+ * Return: result of the operation
+ */
+double compute(long choice, double a, double b)
+{
+	if (choice == 1)
+		return (a + b);
+	if (choice == 2)
+		return (a - b);
+
+	return (a * b);
+}
+
+/**
  * run_choice - runs the operation chosen in the menu
  * @choice: validated menu choice from 1 to 4
  *
@@ -118,8 +136,9 @@ int run_choice(long choice)
 {
 	double a;
 	double b;
+	double result;
 
-	if (choice > 2)
+	if (choice > 3)
 	{
 		printf("Not implemented yet\n");
 		return (1);
@@ -128,10 +147,10 @@ int run_choice(long choice)
 	if (read_number("A: ", &a) == -1 || read_number("B: ", &b) == -1)
 		return (-1);
 
-	if (choice == 1)
-		printf("Result: %.10g\n", a + b);
-	else
-		printf("Result: %.10g\n", a - b);
+	result = compute(choice, a, b);
+	if (result == 0)
+		result = 0;
+	printf("Result: %.15g\n", result);
 
 	return (1);
 }
