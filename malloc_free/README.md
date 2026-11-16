@@ -14,3 +14,4 @@ gcc -Wall -pedantic -Werror -Wextra -std=gnu89 *.c -o a
 ## Author
 
 15863-wm
+- 1-strdup.c: returns a pointer to a duplicate of a string
